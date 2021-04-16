@@ -657,11 +657,125 @@ uname=admin&passwd=admin' and updatexml(1,concat('^',database(),'^'),1) #&submit
 
 ![image](https://user-images.githubusercontent.com/76896357/114988290-be66fb80-9ec8-11eb-9e62-a09e39a637f3.png)
 
+
+额。。。说实话这道题kennel是我的原因，报出来的全是admin，还是看上面的博客吧
+
 ## 18. 用户代理头部注入
 
 ![image](https://user-images.githubusercontent.com/76896357/114988631-20bffc00-9ec9-11eb-8ced-89ba77c7baa9.png)
 
 看见这样的界面，看见ip，直接抓包
+ 
+ 额。。。
+ 
+看下源代码吧
+
+![image](https://user-images.githubusercontent.com/76896357/115002111-f2e1b400-9ed6-11eb-8f03-30d01086de1c.png)
+
+用户名和密码都做了检查，但是他除了ip还接受了user-agent
+
+![image](https://user-images.githubusercontent.com/76896357/115002470-5d92ef80-9ed7-11eb-990f-3f936691b39c.png)
+
+查询语句中存在uagent，那么考虑再user-gent中注入
+
+* 查库：
+```
+User-Agent: 'and extractvalue(1,concat(0x7e,(select database()),0x7e)) and '//下面千万要把账号密码带上，不然程序走的是另一条路线
+```
+![image](https://user-images.githubusercontent.com/76896357/115007886-10b21780-9edd-11eb-9be8-b350f5c54846.png)
+
+接下来就是🧐构造语句了
+
+## 19. refer头注入
+
+和18题类似，过。。。
+
+## 20. cookie注入
+
+输入正确的用户名密码后，看到如下界面
+
+![image](https://user-images.githubusercontent.com/76896357/115010624-35f45500-9ee0-11eb-8824-028699905a1d.png)
+
+那么就想到cookie了，抓包看一下
+
+![image](https://user-images.githubusercontent.com/76896357/115010717-4f959c80-9ee0-11eb-8dd5-7bb9a527115d.png)
+
+* 查看闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/115011707-89b36e00-9ee1-11eb-99d0-c256a4f0b869.png)
+
+* 看下有没有回显
+
+![image](https://user-images.githubusercontent.com/76896357/115011235-fc701980-9ee0-11eb-91c6-dc9d0065d4a9.png)
+
+有回显
+
+* 查库
+
+![image](https://user-images.githubusercontent.com/76896357/115011199-efebc100-9ee0-11eb-847e-f4e8c1700402.png)
+
+可以注入
+
+接下来就是在回显的位置构造sql语句了，不再赘述
+
+## 21. 复杂的字符型注入
+
+继续抓包看一下，发的是啥
+
+![image](https://user-images.githubusercontent.com/76896357/115012050-edd63200-9ee1-11eb-9dd2-3b1aba96f72d.png)
+
+一开始以为啥也没有，放了几个包后，发现那个玩意。。。。
+意味深长。。。试一下
+
+当然首先是要解密 %3D是=，猜想是base64
+![image](https://user-images.githubusercontent.com/76896357/115012443-6ccb6a80-9ee2-11eb-8689-519cfba43cd8.png)
+
+nice
+
+在加密那里构造语句，加密后放进cookie里面
+
+* 查看闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/115012854-e4999500-9ee2-11eb-91e7-a0eb02d88838.png)
+
+* 查看有没有回显
+
+```
+-admin') union select 1,2,3 #//利用#来注释
+```
+编译后的密文
+
+![image](https://user-images.githubusercontent.com/76896357/115013185-51ad2a80-9ee3-11eb-8b51-6ecf9801d7e4.png)
+
+可以查到回显位
+
+![image](https://user-images.githubusercontent.com/76896357/115013229-5a9dfc00-9ee3-11eb-9391-63e0be6302a0.png)
+
+接下来，根据那条语句，构造sql语句就可以了，再把语句构造成base64密文，复制到cookie那里
+
+## 22. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
