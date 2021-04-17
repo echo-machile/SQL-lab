@@ -1297,15 +1297,52 @@ nice,可以啊
 
 ![image](https://user-images.githubusercontent.com/76896357/115113880-0cf6c180-9fbf-11eb-8724-a4f465f83d43.png)
 
-。。。。
-
-## 43. POST基于错误的堆叠注入
+。。。。之后就不做了
 
 
+## 43. POST基于错误的二次堆叠注入
+
+* 查看闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/115114873-1171a900-9fc4-11eb-91ed-d38c8a14b0b2.png)
+
+‘)的闭合方式
+
+* 报错注入
+
+![image](https://user-images.githubusercontent.com/76896357/115115510-6bc03900-9fc7-11eb-8ce4-62e25ec70e2e.png)
 
 
+报错注入也不行
+
+走偏了，，这个就是最直接加个分号后面再构造一条sql语句
+
+![image](https://user-images.githubusercontent.com/76896357/115116532-8d6fef00-9fcc-11eb-9d91-1247d1dd19b4.png)
+
+![image](https://user-images.githubusercontent.com/76896357/115116576-c4de9b80-9fcc-11eb-8286-45e418b5420d.png)
+
+## 44. 同理过了，，，
 
 
+## 45. 同理
+```
+1');insert into users(id,username,password) values(45,'Less45','Less45')#
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115117052-4e8f6880-9fcf-11eb-843d-24364567e9de.png)
+
+![image](https://user-images.githubusercontent.com/76896357/115117061-5c44ee00-9fcf-11eb-80f5-7c5c2567091a.png)
+
+
+## 46. order by注入
+
+![Uploading image.png…]()
+
+![Uploading image.png…]()
+
+* 报错注入
+
+![Uploading image.png…]()
 
 
 
