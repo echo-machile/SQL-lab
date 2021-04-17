@@ -1269,10 +1269,75 @@ http://192.168.220.12/sqli/Less-40/?id=-1%27)%20union%20select%201,2,3%20--+//�
 
 * 看见表单，先抓包看一下
 
-有点难过，不知道干啥，先过
+发现账号什么的都不行，那么就想到密码了呗
 
+* 闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/115113008-ad96b280-9fba-11eb-8e47-bc83da727b85.png)
+
+* 看一下有没有回显
+
+![image](https://user-images.githubusercontent.com/76896357/115113142-59400280-9fbb-11eb-9b33-50420ce44766.png)
+
+无
+
+* 看下报错注入
+
+![image](https://user-images.githubusercontent.com/76896357/115113718-48dd5700-9fbe-11eb-9657-8bdd32a3a7c1.png)
+
+
+nice,可以啊
+
+* 查表
+
+![image](https://user-images.githubusercontent.com/76896357/115113701-2cd9b580-9fbe-11eb-956e-808f30133e38.png)
+
+* 查列
+
+
+![image](https://user-images.githubusercontent.com/76896357/115113880-0cf6c180-9fbf-11eb-8724-a4f465f83d43.png)
+
+。。。。
 
 ## 43. POST基于错误的堆叠注入
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
