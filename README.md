@@ -1334,15 +1334,39 @@ nice,可以啊
 ![image](https://user-images.githubusercontent.com/76896357/115117061-5c44ee00-9fcf-11eb-80f5-7c5c2567091a.png)
 
 
-## 46. order by注入
+## 46. 数字型order by注入
 
-![Uploading image.png…]()
+检查是否存在order by注入
 
-![Uploading image.png…]()
+![image](https://user-images.githubusercontent.com/76896357/115117576-e726e800-9fd1-11eb-9bc0-e0d49194de58.png)
+
+```
+?sort = 1+asc
+?sort = 1+desc
+```
+asc
+
+![image](https://user-images.githubusercontent.com/76896357/115117612-1178a580-9fd2-11eb-82f8-01ba259ec77f.png)
+
+desc
+
+![image](https://user-images.githubusercontent.com/76896357/115117621-1dfcfe00-9fd2-11eb-953d-8220b886b00d.png)
+
+说明存在order by注入
 
 * 报错注入
 
-![Uploading image.png…]()
+![image](https://user-images.githubusercontent.com/76896357/115117503-78498f00-9fd1-11eb-87b9-e5bd1f20c9d8.png)
+
+## 47. 字符型order by注入
+
+* 加了单引号的updatxml仍然可以注入
+
+![image](https://user-images.githubusercontent.com/76896357/115118132-746b3c00-9fd4-11eb-97ef-dcdb3560c62c.png)
+
+## 48. 数字型order by盲注
+
+
 
 
 
